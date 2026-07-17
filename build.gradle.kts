@@ -1,8 +1,8 @@
 plugins {
-    id("com.android.application") version "8.2.0"
-    kotlin("android") version "1.9.20"
-    kotlin("kapt") version "1.9.20"
-    id("com.google.dagger.hilt.android") version "2.50"
+    id("com.android.application")
+    kotlin("android")
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
