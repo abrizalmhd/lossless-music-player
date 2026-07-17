@@ -10,8 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -21,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,27 +52,44 @@ fun NowPlayingScreen(
     val currentMusic by viewModel.currentMusic.collectAsState(initial = null)
     val isPlaying by viewModel.isPlaying.collectAsState(initial = false)
     val playbackPosition by viewModel.playbackPosition.collectAsState(initial = 0L)
+    val visualizerBands by viewModel.visualizerBands.collectAsState()
     var sliderPosition by remember { mutableFloatStateOf(0f) }
 
-    currentMusic?.let { music ->
+    if (currentMusic != null) {
+        val music = currentMusic!!
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(20.dp),
+                .padding(20.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Back Button
+            // Header
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
                         imageVector = Icons.Default.SkipPrevious,
                         contentDescription = "Back",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                Text(
+                    text = "Now Playing",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                IconButton(onClick = { /* Menu */ }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Menu",
                         modifier = Modifier.size(24.dp),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
@@ -86,8 +109,6 @@ fun NowPlayingScreen(
                     .padding(40.dp),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             // Song Info
             Column(
@@ -115,7 +136,13 @@ fun NowPlayingScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // Audio Visualizer
+            AudioVisualizerView(
+                bands = visualizerBands,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+            )
 
             // Audio Info (Hi-Fi Badge)
             Row(
@@ -125,44 +152,48 @@ fun NowPlayingScreen(
                     .fillMaxWidth()
                     .background(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp)
                     )
                     .padding(12.dp)
             ) {
                 Text(
-                    text = "🔊 Hi-Fi",
+                    text = "🎵 Hi-Fi Audio",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = music.format,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
                 )
                 Text(
-                    text = "|",
+                    text = "•",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = music.sampleRate,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "|",
+                    text = "•",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = music.bitrate,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             // Playback Progress
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -170,7 +201,11 @@ fun NowPlayingScreen(
                     value = sliderPosition,
                     onValueChange = { sliderPosition = it },
                     modifier = Modifier.fillMaxWidth(),
-                    valueRange = 0f..music.duration.toFloat()
+                    valueRange = 0f..music.duration.toFloat(),
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary
+                    )
                 )
                 Row(
                     modifier = Modifier
@@ -191,15 +226,13 @@ fun NowPlayingScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             // Playback Controls
             Row(
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                IconButton(onClick = { /* Previous */ }) {
+                IconButton(onClick = { viewModel.previousTrack() }) {
                     Icon(
                         imageVector = Icons.Default.SkipPrevious,
                         contentDescription = "Previous",
@@ -225,7 +258,7 @@ fun NowPlayingScreen(
                     )
                 }
 
-                IconButton(onClick = { /* Next */ }) {
+                IconButton(onClick = { viewModel.nextTrack() }) {
                     Icon(
                         imageVector = Icons.Default.SkipNext,
                         contentDescription = "Next",
@@ -234,8 +267,42 @@ fun NowPlayingScreen(
                     )
                 }
             }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(12.dp))
+@Composable
+fun AudioVisualizerView(
+    bands: IntArray,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        repeat(32) { index ->
+            val height = if (index < bands.size) {
+                (bands[index] / 100f) * 60.dp
+            } else {
+                4.dp
+            }
+            
+            Spacer(
+                modifier = Modifier
+                    .width(2.dp)
+                    .height(height)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(2.dp)
+                    )
+            )
         }
     }
 }
