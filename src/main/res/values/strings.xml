@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">🎵 Lossless Music Player</string>
+    <string name="app_description">Premium Hi-Fi Audio Player with Lossless Format Support</string>
+    
+    <!-- Navigation -->
+    <string name="home">Home</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="playlists">Playlists</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="settings">Settings</string>
+    
+    <!-- Player Controls -->
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="skip_forward">Skip Forward</string>
+    <string name="skip_backward">Skip Backward</string>
+    
+    <!-- Library -->
+    <string name="search_songs">Search songs, artists...</string>
+    <string name="library">Library</string>
+    <string name="all_songs">All Songs</string>
+    <string name="artists">Artists</string>
+    <string name="albums">Albums</string>
+    <string name="no_songs">No songs found</string>
+    
+    <!-- Equalizer -->
+    <string name="no_preset">No Preset</string>
+    <string name="manual_adjustment">Manual Adjustment</string>
+    <string name="flat">Flat</string>
+    <string name="bass_boost">Bass Boost</string>
+    <string name="treble_boost">Treble Boost</string>
+    <string name="balanced">Balanced</string>
+    <string name="warm">Warm</string>
+    <string name="bright">Bright</string>
+    
+    <!-- Audio Info -->
+    <string name="hifi_audio">🎵 Hi-Fi Audio</string>
+    <string name="duration">Duration</string>
+    <string name="bitrate">Bitrate</string>
+    <string name="sample_rate">Sample Rate</string>
+    <string name="format">Format</string>
+</resources>
